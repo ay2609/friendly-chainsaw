@@ -42,6 +42,8 @@ def digital_to_spec(
     Tuple[np.ndarray, float], Tuple[np.ndarray, float, Figure, Axes, float, float]
 ]:
     """
+    Kyl3
+
     Produces a spectrogram and a cut-off intensity to yield the
     specified fraction of data.
 
@@ -202,7 +204,7 @@ def fingerprints_to_matches(
         database: Dict[Tuple[int, int, int], List[Tuple[SongID, int]]],
 ) -> Tuple[SongID, int]:
     """
-    Avi &
+    Avi & Hunter
 
     Generates database matches from all of a sample's fingerprints.
 
@@ -229,6 +231,8 @@ def fingerprints_to_matches(
 
 def matches_to_best_match(matches: Iterable[Tuple[SongID, float]]) -> SongID:
     """
+    Avi & Hunter
+
     Determines the song-ID that has the most consistent fingerprint-offset
 
     Parameters
