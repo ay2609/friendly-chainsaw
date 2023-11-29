@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Tuple, Union
+from const import *
 
 import numpy as _np
 from matplotlib.pyplot import Axes, Figure
