@@ -10,6 +10,8 @@ from microphone import record_audio
 
 def get_digital_recording(time: float) -> Tuple[_np.ndarray, int]:
     """
+    Nobu
+
     Get the digital samples and sampling rate of a microphone's recording.
 
     Parameters
@@ -39,6 +41,8 @@ def match_sample(
         fingerprint_fanout: int = FINGERPRINT_FANOUT,
 ) -> str:
     """
+    Kyle
+
     Given a digital signal, produce the best match from the fingerprint database.
 
     Parameters
@@ -97,6 +101,7 @@ def plot_song(
         local_peak_nn_radius: int = LOCAL_PEAK_NN_RADIUS,
 ) -> Tuple[Figure, Axes]:
     """
+    Avi
 
     Plot a spectrogram and fingerprint features for a song.
 
