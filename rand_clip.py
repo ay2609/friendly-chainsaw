@@ -1,14 +1,4 @@
 import numpy as np
-import random
-from collections import Counter
-from typing import Dict, Iterable, List, Sequence, Tuple, TypeVar
-
-import matplotlib.mlab as mlab
-# from matplotlib.pyplot import Axes, Figure
-from numba import njit
-from scipy.ndimage.morphology import generate_binary_structure, iterate_structure
-
-SongID = TypeVar("SongID")
 
 
 def rand_clip(digital: np.ndarray, new: float, fs: int = 44100) -> np.ndarray:
@@ -33,4 +23,10 @@ def rand_clip(digital: np.ndarray, new: float, fs: int = 44100) -> np.ndarray:
     digital : numpy.ndarray, shape=(T_clipped, )
         Clipped digital signal, sampled from a random starting point"""
 
-    # Student Code:
+    new_len = int(new * fs)
+    start_point = np.random.randint(0, len(digital) - new_len)
+
+    # Extract the clipped signal
+    clipped_signal = digital[start_point : start_point + new_len]
+
+    return clipped_signal
