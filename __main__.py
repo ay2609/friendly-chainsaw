@@ -1,9 +1,13 @@
 from time import time
 
+from database import Database
+
+database = Database.get_instance()
+
 database.switch_db("tutorial1")
 
 # empty database to start with
-list_songs()
+print(database.list_songs())
 
 # Replace with your own songs
 
