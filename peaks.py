@@ -22,6 +22,41 @@ def _peaks(spec, rows, cols, amp_min):
     :return:
     """
     peaks = []
+
+    # Iterate over the 2-D data in col-major order
+    # we want to see if there is a local peak located at
+    # row=r, col=c
+    for c, r in np.ndindex(*spec.shape[::-1]):
+        if spec[r, c] <= amp_min:
+            # The amplitude falls beneath the minimum threshold
+            # thus this can't be a peak.
+            continue
+
+        # Iterating over the neighborhood centered on (r, c)
+        # dr: displacement from r
+        # dc: discplacement from c
+        for dr, dc in zip(rows, cols):
+            if dr == 0 and dc == 0:
+                # This would compare (r, c) with itself.. skip!
+                continue
+
+            if not (0 <= r + dr < spec.shape[0]):
+                # neighbor falls outside of boundary
+                continue
+
+            # mirror over array boundary
+            if not (0 <= c + dc < spec.shape[1]):
+                # neighbor falls outside of boundary
+                continue
+
+            if spec[r, c] < spec[r + dr, c + dc]:
+                # One of the amplitudes within the neighborhood
+                # is larger, thus data_2d[r, c] cannot be a peak
+                break
+        else:
+            # if we did not break from the for-loop then (r, c) is a peak
+            peaks.append((r, c))
+
     # We want to iterate over the array in column-major
     # order so that we order the peaks by time. That is,
     # we look for nearest neighbors of increasing frequencies
