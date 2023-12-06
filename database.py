@@ -1,10 +1,14 @@
 import pickle
 from collections import abc, defaultdict
 from pathlib import Path
-from typing import Dict, List, NamedTuple, Optional, Sequence, Tuple, Union
+from typing import Dict, List, NamedTuple, Optional, Sequence, Tuple, Union, Iterable
 
 import librosa
 
+from const import SAMPLING_RATE, MIN_FRAC_AMP_CUTOFF, LOCAL_PEAK_NN_RADIUS, FINGERPRINT_FANOUT
+from dig_to_spec import digital_to_spec
+from local_peaks import local_peaks
+from peaks_to_fingerprints import peaks_to_fingerprints
 
 PathLike = Union[str, Path]
 
@@ -17,11 +21,18 @@ class Song(NamedTuple):
 class Database:
     """Stores the audio fingerprints associated with songs that have been added to the database"""
 
-    def __init__(self):
+    _database: 'Database' = None
 
+    @classmethod
+    def get_instance(cls) -> 'Database':
+        if cls._database is None:
+            cls._database = cls()
+        return cls._database
+
+    def __init__(self) -> None:
         # cwd == current working directory:
         cwd = Path().resolve()
-        #self.default_path = Path(__file__).parent / "song_db.pkl"
+        # self.default_path = Path(__file__).parent / "song_db.pkl"
         self.default_path = cwd / "song_db.pkl"
 
         self.path: Path = self.default_path
@@ -36,8 +47,10 @@ class Database:
 
         self._loaded = False
 
+        self.load()
+
     @property
-    def song_list(self) -> List[Optional[Tuple[str, Optional[str]]]]:
+    def song_list(self) -> list[tuple[str, str]]:
         """A list of (song-name, artist)
 
         Items should not be removed from this list! The song-ID in the
@@ -46,33 +59,35 @@ class Database:
         return list(self._song_list)
 
     @property
-    def pair_mapping(self) -> Dict[Tuple[int, int, int], List[Tuple[int, int]]]:
-        """Stores the mapping: (f1, f2, dt) -> [(song-ID, t1), ...] where
-        (f1, f2, dt) are the frequencies of two peaks and dt is their
-        separation in time. [(song-ID, t1), ...] is the list of all song-IDs
+    def pair_mapping(self) -> dict[tuple[int, int, int], list[tuple[int, int]]]:
+        """Stores the mapping: (f1, f2, dt) -> [(song-ID, t1), ...]
+        Where (f1, f2, dt) are the frequencies of two peaks and dt is their separation in time.
+        [(Song-ID, t1), ...]
+        Is the list of all song-IDs
         that contain this "fingerprint feature", along with the time at which it
         occurs.
 
         Note that all frequencies and times are quantized using histogram binning.
-        Thus we are able to record an integer - indicating the histogram bin
-        location - for each of these values. Multiplying by the bin size will thus
+        Thus, we are able to record an integer - indicating the histogram bin
+        location - for each of these values.
+        Multiplying by the bin size will thus
         convert each integer to the corresponding physical quantity"""
         return self._pair_mapping
 
     def __len__(self) -> int:
         return len(self._song_list)
 
-    def clear(self):
+    def clear(self) -> None:
         """Clears the database"""
         self._pair_mapping.clear()
         self._song_list = []
         self._loaded = False
 
-    def switch_db(self, path: Optional[PathLike] = None):
+    def switch_db(self, path: PathLike = None) -> None:
         """Switch the song database being used by specifying its load/save path. Calling this
         function with no argument will revert to the default database.
 
-        Providing a name with no directories will assume database as the directory,
+        Providing a name with no directories will assume the database as the directory,
         otherwise the provided path is used. All databases will be saved as .pkl files.
 
         Parameters
@@ -109,7 +124,7 @@ class Database:
             self._loaded = _loaded
             raise e
 
-    def load(self, force: bool = False):
+    def load(self, force: bool = False) -> None:
         """Load the database from database/song_db.pkl if it isn't
         already loaded.
 
@@ -141,9 +156,7 @@ class Database:
 
             self._pair_mapping = data
 
-            with (self.path.parent / (self.path.stem + "_song_list.pkl")).open(
-                    mode="rb"
-            ) as f:
+            with (self.path.parent / (self.path.stem + "_song_list.pkl")).open(mode="rb") as f:
                 song_list = pickle.load(f)
 
             assert isinstance(
@@ -154,11 +167,11 @@ class Database:
             print("song database loaded from: {}".format(self.path.absolute()))
         self._loaded = True
 
-    def remove_song(self, name: str, artist: Optional[str] = None):
+    def remove_song(self, name: str, artist: str = None) -> None:
         try:
-            # do not delete items from song list. song_id in database
-            # is determined by song's position in song list. Removing
-            # song will create offset in results.
+            # Do not delete items from the song list.
+            # Song_id in the database is determined by a song's position in the song list.
+            # Removing song will create offset in results.
             song_id = self._song_list.index((name, artist))
             self._song_list[song_id] = None
 
@@ -169,7 +182,7 @@ class Database:
         except ValueError:
             print("{} not in database".format((name, artist)))
 
-    def save(self):
+    def save(self) -> None:
         if self._pair_mapping is None:
             print("No changes to face-database to save")
             return None
@@ -177,18 +190,16 @@ class Database:
         with self.path.open(mode="wb") as f:
             pickle.dump(self._pair_mapping, f)
 
-        with (self.path.parent / (self.path.stem + "_song_list.pkl")).open(
-                mode="wb"
-        ) as f:
+        with (self.path.parent / (self.path.stem + "_song_list.pkl")).open(mode="wb") as f:
             pickle.dump(self._song_list, f)
 
         print("Song database saved to: {}".format(self.path.absolute()))
 
     def add_songs(
             self,
-            songs: Union[Path, Sequence[Path]],
-            names: Optional[Sequence[str]] = None,
-            artists: Optional[Sequence[str]] = None,
+            songs: Path | Iterable[Path],
+            names: Iterable[str] = None,
+            artists: Iterable[str] = None,
             *,
             sampling_rate: int = SAMPLING_RATE,
             min_frac_amp_cutoff: float = MIN_FRAC_AMP_CUTOFF,
@@ -214,7 +225,7 @@ class Database:
 
         min_frac_amp_cutoff: float, optional (default=_defaults.MIN_FRAC_AMP_CUTOFF)
             The fractional portion of intensities for which the cutoff is selected.
-            E.g. frac_cut=0.8 will produce a cutoff intensity such that the bottom 80%
+            E.g., frac_cut=0.8 will produce a cutoff intensity such that the bottom 80%
             of intensities are excluded.
 
         local_peak_nn_radius: int, optional (default=_defaults.LOCAL_PEAK_NN_RADIUS)
@@ -261,9 +272,7 @@ class Database:
                 p_nn=local_peak_nn_radius,
             )
 
-            for f1_f2_dt, t1 in peaks_to_fingerprints(
-                    peaks, fan_value=fingerprint_fanout
-            ):
+            for f1_f2_dt, t1 in peaks_to_fingerprints(peaks, fan_value=fingerprint_fanout):
                 self._pair_mapping[f1_f2_dt].append((song_id, t1))
 
             self._song_list.append((name, artist))
@@ -276,100 +285,6 @@ class Database:
                 )
             )
 
-    def list_songs(self) -> List[Song]:
+    def list_songs(self) -> list[Song]:
         sorted_song = sorted(x for x in self._song_list if x is not None)
         return [Song(*x) for x in sorted_song]
-
-
-database = Database()
-
-
-def load_song_db(func=None):
-    """ This function can be invoked directly to lazy-load the song-recognition database, or it can
-    be used as a decorator: the database is lazy-loaded prior to invoking the decorated function.
-
-    See face_rec.face_db._load for more information.
-
-    Parameters
-    ----------
-    func : Optional[Callable]
-
-    Returns
-    -------
-    Union[None, Callable]"""
-    if func is None:
-        database.load()
-        return None
-
-    from functools import wraps
-
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        database.load()
-        return func(*args, **kwargs)
-    return wrapper
-
-
-def switch_db(path=None):
-    """ Switch the song database being used by specifying its load/save path. Calling this
-    function with no argument will revert to the default database.
-
-    Providing a name with no directories will assume database as the directory,
-    otherwise the provided path is used. All databases will be saved as .pkl files.
-
-    Parameters
-    ----------
-    path : PathLike"""
-    database.switch_db(path)
-
-
-@load_song_db
-def clear(x: bool):
-    """ Clear the song database.
-
-    You must subsequently run `save_song_database()` to save this change.
-
-    Parameters
-    ----------
-    x : bool
-        Pass True explicitly to confirm that you want to clear the database."""
-    assert x is True
-    database.clear()
-
-
-def save():
-    """ Save the database."""
-    database.save()
-
-
-@load_song_db
-def add_songs(songs, names=None, artists=None):
-    """ Add songs to the fingerprinting database
-
-        Parameters
-        ----------
-        songs : Union[str, Iterable[str]]
-           File path(s) to .mp3, .wav, (and maybe other formats) file(s) to be added.
-
-        names : Optional[Sequence[Union[str, None]]]
-           Corresponding song names. If `None` is provided, the dong name is inferred from
-           the filename.
-
-        artists : Optional[Sequence[Union[str, None]]]
-           Corresponding song artists.
-
-        Notes
-        -----
-        `add_songs_to_database('path/to/song/SongTitle.mp3')` will log this song in the database
-        under the title 'SongTitle'. """
-    database.add_songs(songs, names=names, artists=artists)
-
-
-@load_song_db
-def list_songs():
-    return database.list_songs()
-
-
-@load_song_db
-def remove_song(name, artist=None):
-    database.remove_song(name, artist)
