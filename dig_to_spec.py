@@ -69,6 +69,7 @@ def digital_to_spec(
         return S, cutoff
     else:
         df = freqs[1] - freqs[0]
-        dt = times[1] - times[0]
+        dt = times[1]
+        - times[0]
         return S, cutoff, fig, ax, df, dt
 
