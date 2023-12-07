@@ -7,7 +7,7 @@ import librosa
 
 from const import SAMPLING_RATE, MIN_FRAC_AMP_CUTOFF, LOCAL_PEAK_NN_RADIUS, FINGERPRINT_FANOUT
 from dig_to_spec import digital_to_spec
-from local_peaks import local_peaks
+from peaks import local_peaks
 from peaks_to_fingerprints import peaks_to_fingerprints
 
 PathLike = Union[str, Path]

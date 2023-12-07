@@ -116,4 +116,12 @@ def local_peaks(
     # physical (t, f) coordinates. This makes storage and compression of peak
     # locations much simpler.
 
-    return detected_peaks
+    rows, cols = np.where(amp_min)
+    assert amp_min.shape[0] % 2 == 1
+    assert amp_min.shape[1] % 2 == 1
+
+    # center neighborhood indices around center of neighborhood
+    rows -= amp_min.shape[0] // 2
+    cols -= amp_min.shape[1] // 2
+
+    return _peaks(log_spectrogram, rows, cols, amp_min=amp_min)
