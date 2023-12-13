@@ -6,7 +6,7 @@ SongID = TypeVar("SongID")
 def fingerprints_to_matches(
         sample_fingerprints: Iterable[Tuple[Tuple[int, int, int], int]],
         database: Dict[Tuple[int, int, int], List[Tuple[SongID, int]]],
-) -> None:
+) -> Iterable[Tuple[SongID, float]]:
     """
     Avi & Hunter
 
@@ -24,9 +24,9 @@ def fingerprints_to_matches(
         song IDs containing that signature, and the time at which the signature occurred
         in the song.
 
-    Yields
+    Returns
     ------
-    Tuple[song_ID, dt]
+    Iterable[Tuple[song_ID, dt]]
         A song ID that had a matching peak-pair signature, and the time offset between when
         the signature occurred in the song versus the sample."""
 
@@ -51,3 +51,4 @@ def matches_to_best_match(matches: Iterable[Tuple[SongID, float]]) -> SongID:
         The song-ID with the most common time-offset with the sample."""
 
     # Student Code:
+
