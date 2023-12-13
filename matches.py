@@ -27,7 +27,7 @@ def fingerprints_to_matches(
     Returns
     ------
     Iterable[Tuple[song_ID, dt]]
-        A song ID that had a matching peak-pair signature, and the time offset between when
+        An iterable of song IDs that had matching peak-pair signatures, and the time offset between when
         the signature occurred in the song versus the sample."""
 
     # Student Code:
