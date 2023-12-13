@@ -1,12 +1,10 @@
 from typing import Dict, Iterable, List, Tuple, TypeVar
 
-SongID = TypeVar("SongID")
-
 
 def fingerprints_to_matches(
         sample_fingerprints: Iterable[Tuple[Tuple[int, int, int], int]],
-        database: Dict[Tuple[int, int, int], List[Tuple[SongID, int]]],
-) -> Iterable[Tuple[SongID, float]]:
+        database: Dict[Tuple[int, int, int], List[Tuple[int, int]]],
+) -> Iterable[Tuple[int, float]]:
     """
     Avi & Hunter
 
@@ -33,7 +31,7 @@ def fingerprints_to_matches(
     # Student Code:
 
 
-def matches_to_best_match(matches: Iterable[Tuple[SongID, float]]) -> SongID:
+def matches_to_best_match(matches: Iterable[Tuple[int, float]]) -> int:
     """
     Avi & Hunter
 
