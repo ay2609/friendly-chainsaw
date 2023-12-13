@@ -10,6 +10,7 @@ from scipy.ndimage.morphology import generate_binary_structure, iterate_structur
 
 SongID = TypeVar("SongID")
 
+
 @njit()
 def _peaks(spec, rows, cols, amp_min):
     """

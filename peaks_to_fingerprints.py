@@ -10,6 +10,7 @@ from scipy.ndimage.morphology import generate_binary_structure, iterate_structur
 
 SongID = TypeVar("SongID")
 
+
 def peaks_to_fingerprints(
         peaks: Sequence[Tuple[int, int]], fan_value: int
 ) -> Iterable[Tuple[Tuple[int, int, int], int]]:
