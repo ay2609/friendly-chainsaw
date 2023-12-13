@@ -10,6 +10,7 @@ from scipy.ndimage.morphology import generate_binary_structure, iterate_structur
 
 SongID = TypeVar("SongID")
 
+
 def peaks_to_fingerprints(
         peaks: Sequence[Tuple[int, int]], fan_value: int
 ) -> Iterable[Tuple[Tuple[int, int, int], int]]:
@@ -28,11 +29,27 @@ def peaks_to_fingerprints(
         Given a peak, `fan_value` indicates the number of subsequent peaks
         to be used to form fingerprint features.
 
-    Yields
+    Iterable
     ------
-    Tuple[Tuple[int, int, int], int]
+    Iterable[Tuple[Tuple[int, int, int], int]]
         ((f_{n}, f_{n+j}, t_{n+j} - t_{n}), t_{n})
         The frequency value of peak n, peak n+j, their time-offset, along with the
-        time at which peak n occurred."""
+        time at which peak n occurred.
+        """
 
-    # Student Code:
+    fingerprints = []
+
+    for index, (freq, time) in enumerate(peaks):
+
+        if index == len(peaks) - 1:
+            pass
+
+        elif fan_value + index > len(peaks) - 1:
+            for j in range(len(peaks) - 1 - index):
+                fingerprints.append(((freq, peaks[index + j][0], peaks[index + j][1] - time), time))
+
+        else:
+            for j in range(fan_value):
+                fingerprints.append(((freq, peaks[index + j][0], peaks[index + j][1] - time), time))
+
+    return fingerprints
