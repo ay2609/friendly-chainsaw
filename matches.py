@@ -40,3 +40,22 @@ def fingerprints_to_matches(
 
     # Student Code:
 
+
+def matches_to_best_match(matches: Iterable[Tuple[SongID, float]]) -> SongID:
+    """
+    Avi & Hunter
+
+    Determines the song-ID that has the most consistent fingerprint-offset
+
+    Parameters
+    ----------
+    matches : Iterable[Tuple[song_ID, dt]]
+        A song-ID that had a match with the sample, and the time-offset between their
+        matching signatures.
+
+    Returns
+    -------
+    SongID
+        The song-ID with the most common time-offset with the sample."""
+
+    # Student Code:

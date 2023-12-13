@@ -1,13 +1,11 @@
 import numpy as np
 from pathlib import Path
-from typing import Tuple, Union
+from typing import Tuple
 
-from matplotlib.pyplot import Axes, Figure
-
-import librosa as _librosa
 from microphone import record_audio
 
-def get_digital_recording(time: float) -> Tuple[_np.ndarray, int]:
+
+def get_digital_recording(time: float) -> Tuple[np.ndarray, int]:
     """
     Get the digital samples and sampling rate of a microphone's recording.
 
@@ -22,9 +20,10 @@ def get_digital_recording(time: float) -> Tuple[_np.ndarray, int]:
         The digital samples (mono: shape-(N,)) from the recording and
         the sampling rate used.
     """
-
-    # Student Code:
-
+    digital_data, sample_rate = record_audio(time)
+    # digital_data = np.frombuffer(digital_data, dtype=np.int16)
+    digital_data = [np.fromstring(data, dtype=np.int16) for data in digital_data]
+    digital_data = np.hstack(digital_data)
     return digital_data, sample_rate
 
 
