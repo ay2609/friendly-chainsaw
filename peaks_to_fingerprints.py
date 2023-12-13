@@ -29,7 +29,7 @@ def peaks_to_fingerprints(
         Given a peak, `fan_value` indicates the number of subsequent peaks
         to be used to form fingerprint features.
 
-    Iterable
+    Returns
     ------
     Iterable[Tuple[Tuple[int, int, int], int]]
         ((f_{n}, f_{n+j}, t_{n+j} - t_{n}), t_{n})
