@@ -1,28 +1,26 @@
-from pathlib import Path
-from typing import Tuple, Union
-
 import numpy as _np
-from matplotlib.pyplot import Axes, Figure
 
-import librosa as _librosa
-from microphone import record_audio
+from const import MIN_FRAC_AMP_CUTOFF, LOCAL_PEAK_NN_RADIUS, FINGERPRINT_FANOUT
+from dig_to_spec import digital_to_spec
+from peaks import local_peaks
+from peaks_to_fingerprints import peaks_to_fingerprints
+from rand_clip import rand_clip
 
 
 def match_sample(
-    sample_digital: _np.ndarray,
-    fs: int,
-    *,
-    min_frac_amp_cutoff: float = MIN_FRAC_AMP_CUTOFF,
-    local_peak_nn_radius: int = LOCAL_PEAK_NN_RADIUS,
-    fingerprint_fanout: int = FINGERPRINT_FANOUT,
+        sample_digital: _np.ndarray,
+        fs: int,
+        *,
+        min_frac_amp_cutoff: float = MIN_FRAC_AMP_CUTOFF,
+        local_peak_nn_radius: int = LOCAL_PEAK_NN_RADIUS,
+        fingerprint_fanout: int = FINGERPRINT_FANOUT,
 ) -> str:
-
     """
     Given a digital signal, produce the best match from the fingerprint database.
 
     Parameters
     ----------
-    sample_digital : numpy.ndarray, shape=(N,)
+    sample_digital : numpy.ndarray, shape=(N, )
         The digital signal
 
     fs : int
@@ -52,7 +50,7 @@ def match_sample(
     rc = rand_clip(sample_digital, 5)
 
     # create a spectrogram from the random sample
-    spec = dig_to_spec(rc)
+    spec = digital_to_spec(rc)
 
     # take the peaks of the spectrogram
     ps = local_peaks(spec)
@@ -61,10 +59,4 @@ def match_sample(
     fins = peaks_to_fingerprints(ps)
 
     # match the fingerprints from the sample to fingerprints from the database
-
-
-
-
-
-
     return name + ("" if artist is None else " by {}".format(artist))
