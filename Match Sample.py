@@ -1,3 +1,13 @@
+from pathlib import Path
+from typing import Tuple, Union
+
+import numpy as _np
+from matplotlib.pyplot import Axes, Figure
+
+import librosa as _librosa
+from microphone import record_audio
+
+
 def match_sample(
     sample_digital: _np.ndarray,
     fs: int,
@@ -6,6 +16,7 @@ def match_sample(
     local_peak_nn_radius: int = LOCAL_PEAK_NN_RADIUS,
     fingerprint_fanout: int = FINGERPRINT_FANOUT,
 ) -> str:
+
     """
     Given a digital signal, produce the best match from the fingerprint database.
 
@@ -50,6 +61,7 @@ def match_sample(
     fins = peaks_to_fingerprints(ps)
 
     # match the fingerprints from the sample to fingerprints from the database
+
 
 
 
