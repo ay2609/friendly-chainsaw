@@ -117,12 +117,15 @@ def local_peaks(
     # physical (t, f) coordinates. This makes storage and compression of peak
     # locations much simpler.
 
-    rows, cols = np.where(amp_min)
-    assert amp_min.shape[0] % 2 == 1
-    assert amp_min.shape[1] % 2 == 1
+    struct = generate_binary_structure(2, 1)
+    neighborhood = iterate_structure(struct, p_nn)
+    rows, cols = np.where(neighborhood)
+
+    assert neighborhood.shape[0] % 2 == 1
+    assert neighborhood.shape[1] % 2 == 1
 
     # center neighborhood indices around center of neighborhood
-    rows -= amp_min.shape[0] // 2
-    cols -= amp_min.shape[1] // 2
+    rows -= neighborhood.shape[0] // 2
+    cols -= neighborhood.shape[1] // 2
 
     return _peaks(log_spectrogram, rows, cols, amp_min=amp_min)
