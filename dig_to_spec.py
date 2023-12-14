@@ -1,22 +1,16 @@
 import numpy as np
-import random
-from collections import Counter
-from typing import Dict, Iterable, List, Sequence, Tuple, TypeVar
 
-import matplotlib.mlab as mlab
-# from matplotlib.pyplot import Axes, Figure
-from numba import njit
-from scipy.ndimage.morphology import generate_binary_structure, iterate_structure
+import matplotlib.pyplot as plt
 
-SongID = TypeVar("SongID")
+from matplotlib.pyplot import Axes, Figure
+from scipy.signal import spectrogram
+
 
 def digital_to_spec(
-        digital: np.ndarray, fs: float, frac_cut: float, plot: bool = False
-) -> Union[
-    Tuple[np.ndarray, float], Tuple[np.ndarray, float, Figure, Axes, float, float]
-]:
+    digital: np.ndarray, fs: float, frac_cut: float, plot: bool = False
+) -> tuple[np.ndarray, float] | tuple[np.ndarray, float, Figure, Axes, float, float]:
     """
-    Kyl3
+    Nobu
 
     Produces a spectrogram and a cut-off intensity to yield the
     specified fraction of data.
@@ -59,17 +53,29 @@ def digital_to_spec(
     # for audio data.
     # Student Code:
 
-    
-
     # Compute percentile-based threshold amplitude; this is greatly optimized by
     # leveraging the apt numpy.partition function.
     # Student Code:
 
-    if not plot:
-        return S, cutoff
-    else:
-        df = freqs[1] - freqs[0]
-        dt = times[1]
-        - times[0]
-        return S, cutoff, fig, ax, df, dt
+    # if not plot:
+    #     return S, cutoff
+    # else:
+    #     df = freqs[1] - freqs[0]
+    #     dt = times[1]
+    #     - times[0]
+    #     return S, cutoff, fig, ax, df, dt
 
+    f, t, Sxx = spectrogram(digital, fs)
+    flatten = Sxx.flatten()
+    sortedd = np.sort(flatten)[::-1]
+
+    index = int(len(sortedd) * frac_cut)
+    cutoff = sortedd[index]
+
+    if not plot:
+        return Sxx, cutoff
+    else:
+        fig, ax = plt.subplots()
+        df = f[1] - f[0]
+        dt = t[1] - t[0]
+        return Sxx, cutoff, fig, ax, df, dt
