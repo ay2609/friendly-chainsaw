@@ -77,6 +77,9 @@ class Database:
     def __len__(self) -> int:
         return len(self._song_list)
 
+    def __getitem__(self, key: tuple[int, int, int]) -> list[tuple[int, int]]:
+        return self.pair_mapping[key]
+
     def clear(self) -> None:
         """Clears the database"""
         self._pair_mapping.clear()
