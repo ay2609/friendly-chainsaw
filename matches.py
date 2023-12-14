@@ -1,4 +1,24 @@
-from typing import Dict, Iterable, List, Tuple, TypeVar
+from typing import Dict, Iterable, List, Tuple
+
+
+class FingerprintOffsets:
+    def __init__(self, song_id: int, time_offset: float):
+        self._song_id = song_id
+        self._time_offset = time_offset
+
+    @property
+    def song_id(self) -> int:
+        return self._song_id
+
+    @property
+    def time_offset(self) -> float:
+        return self._time_offset
+
+    def __gt__(self, other: 'FingerprintOffsets') -> bool:
+        return self.time_offset > other.time_offset
+
+    def __lt__(self, other: 'FingerprintOffsets') -> bool:
+        return self.time_offset < other.time_offset
 
 
 def fingerprints_to_matches(
@@ -62,4 +82,4 @@ def matches_to_best_match(matches: Iterable[Tuple[int, float]]) -> int:
         The song-ID with the most common time-offset with the sample."""
 
     # Student Code:
-
+    return min([FingerprintOffsets(song_id, offset) for song_id, offset in matches]).song_id
