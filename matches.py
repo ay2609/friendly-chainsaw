@@ -1,4 +1,4 @@
-from typing import Dict, Iterable, List, Tuple, TypeVar
+from typing import Dict, Iterable, List, Tuple
 
 
 class FingerprintOffsets:
