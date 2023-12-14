@@ -1,4 +1,4 @@
-from typing import Dict, Iterable, List, Tuple, TypeVar
+from typing import Dict, Iterable, List, Tuple
 
 
 class FingerprintOffsets:
@@ -26,7 +26,8 @@ def fingerprints_to_matches(
         database: Dict[Tuple[int, int, int], List[Tuple[int, int]]],
 ) -> Iterable[Tuple[int, float]]:
     """
-    Avi & Hunter
+
+    kyle
 
     Generates database matches from all of a sample's fingerprints.
 
@@ -49,6 +50,18 @@ def fingerprints_to_matches(
         the signature occurred in the song versus the sample."""
 
     # Student Code:
+
+    matches = []
+
+    for f1_f2_dt, t_sample in sample_fingerprints:
+        o = database.get(f1_f2_dt)
+        if o is not None:
+            for s_id, t_song in o:
+                matches.append(s_id, t_song - t_sample)
+
+    return matches
+
+
 
 
 def matches_to_best_match(matches: Iterable[Tuple[int, float]]) -> int:
