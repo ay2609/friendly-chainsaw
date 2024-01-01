@@ -3,6 +3,7 @@ import matplotlib
 import numpy as np
 
 from const import MIN_FRAC_AMP_CUTOFF, LOCAL_PEAK_NN_RADIUS, SAMPLING_RATE
+from microphone.config import settings
 
 from typing import Union, Tuple
 from pathlib import Path
@@ -43,8 +44,6 @@ def plot_song(
     Returns
     -------
     Tuple[matplotlib.pyplot.Figure, matplotlib.pyplot.Axes]"""
-    from microphone.config import settings
-    from pathlib import Path
 
     # Student Code:
 
