@@ -2,6 +2,8 @@ from time import time
 
 from database import Database
 
+from match_sample import match_sample
+
 database = Database.get_instance()
 
 database.switch_db("tutorial1")

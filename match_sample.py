@@ -5,7 +5,8 @@ from dig_to_spec import digital_to_spec
 from peaks import local_peaks
 from peaks_to_fingerprints import peaks_to_fingerprints
 from rand_clip import rand_clip
-
+from matches import fingerprints_to_matches
+from matches import matches_to_best_match
 
 def match_sample(
         sample_digital: _np.ndarray,
@@ -42,21 +43,26 @@ def match_sample(
     Returns
     -------
     str
-        The song-ID for the best match. `None` if no mat"""
+        The song-ID for the best match. `None` if no match"""
 
     # Student Code:
 
     # take random sample of the full original sample
-    rc = rand_clip(sample_digital, 5)
+    rc = rand_clip(sample_digital, 5, fs)
 
     # create a spectrogram from the random sample
-    spec = digital_to_spec(rc)
+    spec = digital_to_spec(rc, fs, min_frac_amp_cutoff, False, )
 
     # take the peaks of the spectrogram
-    ps = local_peaks(spec)
+    ps = local_peaks(spec, 0, local_peak_nn_radius)
 
     # form fingerprints based on the peaks
-    fins = peaks_to_fingerprints(ps)
+    fins = peaks_to_fingerprints(ps, fingerprint_fanout)
 
     # match the fingerprints from the sample to fingerprints from the database
-    return name + ("" if artist is None else " by {}".format(artist))
+    name = matches_to_best_match(fingerprints_to_matches(fins))
+
+    return (name)
+
+    #code to also return artist:
+     # + ("" if artist is None else " by {}".format(artist)))
