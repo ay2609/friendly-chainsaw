@@ -4,6 +4,10 @@ from database import Database
 
 from match_sample import match_sample
 
+import librosa
+
+from const import SAMPLING_RATE
+
 database = Database.get_instance()
 
 database.switch_db("tutorial1")
@@ -36,6 +40,9 @@ start = time()
 database.add_songs(songs, names, artists)
 dt = time() - start
 
-
 database.save()
 
+samps, sr = librosa.load("Beatles_TwistAndShout.mp3", sr=44100, mono=True,
+                                      offset = 27, duration=10)
+
+match_sample(samps, SAMPLING_RATE)
