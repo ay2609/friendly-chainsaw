@@ -1,3 +1,6 @@
 [submodule "lib/Microphone"]
 	path = lib/Microphone
 	url = https://github.com/CogWorksBWSI/Microphone.git
+[submodule "sturdy-garbanzo"]
+	path = sturdy-garbanzo
+	url = https://github.com/literally-anything/sturdy-garbanzo.git
