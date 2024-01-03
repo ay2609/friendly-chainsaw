@@ -1,12 +1,18 @@
 import matplotlib.pyplot as plt
+import matplotlib.mlab as mlab
 import matplotlib
 import numpy as np
+import librosa
+from mygrad import sliding_window_view
 
 from const import MIN_FRAC_AMP_CUTOFF, LOCAL_PEAK_NN_RADIUS, SAMPLING_RATE
 from microphone.config import settings
 
 from typing import Union, Tuple
 from pathlib import Path
+
+from dig_to_spec import digital_to_spec
+from rand_clip import get_digital_recording
 
 
 def plot_song(
@@ -16,7 +22,7 @@ def plot_song(
         sampling_rate: int = SAMPLING_RATE,
         min_frac_amp_cutoff: float = MIN_FRAC_AMP_CUTOFF,
         local_peak_nn_radius: int = LOCAL_PEAK_NN_RADIUS,
-) -> Tuple[matplotlib.figure, matplotlib.axes]:
+): # -> Tuple[matplotlib.figure, matplotlib.axes]:
     """
 
     Plot a spectrogram and fingerprint features for a song.
@@ -45,6 +51,15 @@ def plot_song(
     -------
     Tuple[matplotlib.pyplot.Figure, matplotlib.pyplot.Axes]"""
 
-    # Student Code:
+    spectrogram, cutoff, fig, ax, df, window_dt = digital_to_spec(song, fs=sampling_rate, frac_cut=min_frac_amp_cutoff, plot=True)
 
     return fig, ax
+
+
+# song, s_rate = get_digital_recording(1) # librosa not working, recordings not working
+song, s_rate = librosa.load("trumpet.wav", sr=44100, mono=True)
+
+fig, ax = plot_song(song)
+
+plt.show()
+
