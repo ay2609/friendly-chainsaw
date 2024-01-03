@@ -21,9 +21,8 @@ def get_digital_recording(time: float) -> Tuple[np.ndarray, int]:
         the sampling rate used.
     """
     digital_data, sample_rate = record_audio(time)
-    # digital_data = np.frombuffer(digital_data, dtype=np.int16)
-    digital_data = [np.fromstring(data, dtype=np.int16) for data in digital_data]
-    digital_data = np.hstack(digital_data)
+    digital_data = np.hstack([np.frombuffer(data, np.int16) for data in digital_data])
+
     return digital_data, sample_rate
 
 
