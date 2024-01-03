@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 
 from matplotlib.pyplot import Axes, Figure
 from scipy.signal import spectrogram
+from mygrad import sliding_window_view
 
 
 def digital_to_spec(
@@ -57,25 +58,56 @@ def digital_to_spec(
     # leveraging the apt numpy.partition function.
     # Student Code:
 
-    # if not plot:
-    #     return S, cutoff
-    # else:
-    #     df = freqs[1] - freqs[0]
-    #     dt = times[1]
-    #     - times[0]
-    #     return S, cutoff, fig, ax, df, dt
+    window_dt = (len(digital) / fs) / 47
 
-    f, t, Sxx = spectrogram(digital, fs)
-    flatten = Sxx.flatten()
+    window_size = int(window_dt * fs)
+
+    windowed_audio = sliding_window_view(
+        digital, window_shape=(window_size,), step=window_size
+    )
+
+    M, N = windowed_audio.shape
+
+    ck_for_each_window = np.fft.rfft(windowed_audio, axis=-1)
+    ak_for_each_window = np.absolute(ck_for_each_window) / N
+    ak_for_each_window[:, 1: (-1 if N % 2 == 0 else None)] *= 2
+    spectrogram = ak_for_each_window.T
+
+    T = len(digital) / fs
+
+    F = (window_size // 2 + 1) / window_dt
+
+    max_freq = 4000
+
+    window_df = (len(digital) / fs) / (fs // 2)
+
+    extent = (0, T, 0, F)
+    aspect_ratio = T / max_freq
+
+    fig, ax = plt.subplots()
+
+    ax.imshow(
+        np.log(spectrogram),
+        origin="lower",
+        aspect=aspect_ratio,
+        extent=extent,
+        interpolation="bilinear",
+    )
+
+    ax.set_ylim(0, max_freq)
+
+    ax.set_xlabel("Time (sec)")
+    ax.set_ylabel("Frequency (Hz)")
+    ax.set_title("Spectrogram of Recording")
+
+    flatten = spectrogram.flatten()
     sortedd = np.sort(flatten)[::-1]
 
     index = int(len(sortedd) * frac_cut)
     cutoff = sortedd[index]
 
+
     if not plot:
-        return Sxx, cutoff
+        return spectrogram, cutoff
     else:
-        fig, ax = plt.subplots()
-        df = f[1] - f[0]
-        dt = t[1] - t[0]
-        return Sxx, cutoff, fig, ax, df, dt
+        return spectrogram, cutoff, fig, ax, window_df, window_dt
