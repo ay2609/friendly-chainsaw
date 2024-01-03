@@ -3,12 +3,13 @@ import os
 from typing import Iterator
 import pathlib
 
-_manifest_path = os.path.join(pathlib.Path(__file__).parent.resolve(), 'sturdy-garbanzo/garbanzo.json')
+_garbanzo_path = os.path.join(pathlib.Path(__file__).parent.resolve(), 'sturdy-garbanzo')
+_manifest_path = os.path.join(_garbanzo_path, 'garbanzo.json')
 
 
 class Garbanzo:
     def __init__(self, data: dict[str, str]) -> None:
-        self.filename = data['file']
+        self.filename = os.path.join(_garbanzo_path, data['file'])
         self.title = data.get('title', 'Kyle forgot the title')
         self.artist = data.get('artist', 'Kyle forgot the artist')
 
