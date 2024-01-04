@@ -6,6 +6,8 @@ from matplotlib.pyplot import Axes, Figure
 from scipy.signal import spectrogram
 from mygrad import sliding_window_view
 
+np.seterr(divide='ignore')
+
 
 def digital_to_spec(
     digital: np.ndarray, fs: float, frac_cut: float, plot: bool = False
