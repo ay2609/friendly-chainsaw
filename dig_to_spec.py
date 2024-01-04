@@ -58,7 +58,7 @@ def digital_to_spec(
     # leveraging the apt numpy.partition function.
     # Student Code:
 
-    window_dt = (len(digital) / fs) / 47
+    window_dt = (1000 / fs)  # dt is constant
 
     window_size = int(window_dt * fs)
 
