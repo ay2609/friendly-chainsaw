@@ -10,6 +10,8 @@ from dig_to_spec import digital_to_spec
 from peaks import local_peaks
 from peaks_to_fingerprints import peaks_to_fingerprints
 
+import numpy as np
+
 PathLike = Union[str, Path]
 
 
@@ -270,10 +272,14 @@ class Database:
             print("adding {}..".format(name))
 
             digital, fs = librosa.load(file_path, sr=sampling_rate, mono=True)
-            peaks = local_peaks(
-                *digital_to_spec(digital, fs, frac_cut=min_frac_amp_cutoff),
-                p_nn=local_peak_nn_radius,
-            )
+
+            spec, cutoff = digital_to_spec(digital, fs, frac_cut=min_frac_amp_cutoff)
+            cutting = int(np.max(spec) * min_frac_amp_cutoff)
+
+            peaks = local_peaks(spec,
+                                amp_min=cutting,
+                                p_nn=local_peak_nn_radius,
+                                )
 
             for f1_f2_dt, t1 in peaks_to_fingerprints(peaks, fan_value=fingerprint_fanout):
                 self._pair_mapping[f1_f2_dt].append((song_id, t1))
