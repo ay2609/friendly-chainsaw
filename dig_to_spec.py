@@ -79,7 +79,7 @@ def digital_to_spec(
 
     max_freq = 8000
 
-    window_df = (len(digital) / fs) / (fs // 2)
+    window_df = (fs // 2 + 1) / (spectrogram.shape[0])
 
     extent = (0, T, 0, F)
     aspect_ratio = T / max_freq
