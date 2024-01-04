@@ -11,31 +11,22 @@ from const import SAMPLING_RATE
 from garbanzo_reader import read_garbanzo
 
 database = Database.get_instance()
-
-database.switch_db("tutorial1")
+database.switch_db("goodone")
 
 # empty database to start with
 print(database.list_songs())
 
 # Replace with your own songs
 
-
-
-
-
 start = time()
-#db.add_songs(songs, names, artists)
-database.add_songs(songs, names, artists)
 dt = time() - start
 
 database.save()
 
-samps, sr = librosa.load("Beatles_TwistAndShout.mp3", sr=44100, mono=True,
-                                      offset = 27, duration=10)
+samps, sr = librosa.load("sturdy-garbanzo/WAP.ogg", mono=True)
 
 match = match_sample(samps, SAMPLING_RATE)
 print(match)
-
 
 # PROVIDED CODE FOR ADDING SONGS TO DATABASE
 # songs = [
