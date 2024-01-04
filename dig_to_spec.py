@@ -77,7 +77,7 @@ def digital_to_spec(
 
     F = (window_size // 2 + 1) / window_dt
 
-    max_freq = 4000
+    max_freq = 8000
 
     window_df = (len(digital) / fs) / (fs // 2)
 
@@ -91,10 +91,11 @@ def digital_to_spec(
         origin="lower",
         aspect=aspect_ratio,
         extent=extent,
-        interpolation="bilinear",
+        interpolation="none",
     )
 
     ax.set_ylim(0, max_freq)
+    ax.set_xlim(0, T)
 
     ax.set_xlabel("Time (sec)")
     ax.set_ylabel("Frequency (Hz)")
@@ -105,7 +106,6 @@ def digital_to_spec(
 
     index = int(len(sortedd) * frac_cut)
     cutoff = sortedd[index]
-
 
     if not plot:
         return spectrogram, cutoff
