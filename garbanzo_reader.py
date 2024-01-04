@@ -4,7 +4,7 @@ from typing import Iterator, Generator, Any
 import pathlib
 
 _garbanzo_path = os.path.join(pathlib.Path(__file__).parent.resolve(), 'sturdy-garbanzo')
-_manifest_path = os.path.join(_garbanzo_path, 'garbanzo.json')
+_manifest_path = os.path.join(_garbanzo_path, 'manifest.json')
 
 
 class Garbanzo:
