@@ -13,6 +13,7 @@ from pathlib import Path
 
 from dig_to_spec import digital_to_spec
 from rand_clip import get_digital_recording
+from peaks import local_peaks
 
 
 def plot_song(
@@ -51,7 +52,16 @@ def plot_song(
     -------
     Tuple[matplotlib.pyplot.Figure, matplotlib.pyplot.Axes]"""
 
-    spectrogram, cutoff, fig, ax, df, window_dt = digital_to_spec(song, fs=sampling_rate, frac_cut=min_frac_amp_cutoff, plot=True)
+    spectrogram, cutoff, fig, ax, window_df, window_dt = digital_to_spec(song, fs=sampling_rate, frac_cut=min_frac_amp_cutoff, plot=True)
+
+    cutting = int(np.max(spectrogram) * min_frac_amp_cutoff)
+
+    peaks = local_peaks(np.log(spectrogram), cutting, local_peak_nn_radius)
+
+    plotted_peaks = np.array([(window_dt * time, window_df * freq) for freq, time in peaks])
+
+    if plotted_peaks != []:
+        plt.gca().scatter(plotted_peaks[:, 0], plotted_peaks[:, 1], c='r')
 
     return fig, ax
 

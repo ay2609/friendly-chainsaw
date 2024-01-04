@@ -58,7 +58,7 @@ def digital_to_spec(
     # leveraging the apt numpy.partition function.
     # Student Code:
 
-    window_dt = (len(digital) / fs) / 47
+    window_dt = (1000 / fs)  # dt is constant
 
     window_size = int(window_dt * fs)
 
@@ -68,18 +68,18 @@ def digital_to_spec(
 
     M, N = windowed_audio.shape
 
-    ck_for_each_window = np.fft.rfft(windowed_audio, axis=-1)
-    ak_for_each_window = np.absolute(ck_for_each_window) / N
-    ak_for_each_window[:, 1: (-1 if N % 2 == 0 else None)] *= 2
+    ck_for_each_window = np.fft.rfft(windowed_audio, n=4096, axis=-1)
+    ak_for_each_window = np.absolute(ck_for_each_window) / 4096
+    ak_for_each_window[:, 1:(-1 if N % 2 == 0 else None)] *= 2
     spectrogram = ak_for_each_window.T
 
     T = len(digital) / fs
 
     F = (window_size // 2 + 1) / window_dt
 
-    max_freq = 4000
+    max_freq = 8000
 
-    window_df = (len(digital) / fs) / (fs // 2)
+    window_df = (fs // 2 + 1) / (spectrogram.shape[0])
 
     extent = (0, T, 0, F)
     aspect_ratio = T / max_freq
@@ -91,10 +91,11 @@ def digital_to_spec(
         origin="lower",
         aspect=aspect_ratio,
         extent=extent,
-        interpolation="bilinear",
+        interpolation="none",
     )
 
     ax.set_ylim(0, max_freq)
+    ax.set_xlim(0, T)
 
     ax.set_xlabel("Time (sec)")
     ax.set_ylabel("Frequency (Hz)")
@@ -105,7 +106,6 @@ def digital_to_spec(
 
     index = int(len(sortedd) * frac_cut)
     cutoff = sortedd[index]
-
 
     if not plot:
         return spectrogram, cutoff
