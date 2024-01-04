@@ -68,9 +68,9 @@ def digital_to_spec(
 
     M, N = windowed_audio.shape
 
-    ck_for_each_window = np.fft.rfft(windowed_audio, axis=-1)
-    ak_for_each_window = np.absolute(ck_for_each_window) / N
-    ak_for_each_window[:, 1: (-1 if N % 2 == 0 else None)] *= 2
+    ck_for_each_window = np.fft.rfft(windowed_audio, n=4096, axis=-1)
+    ak_for_each_window = np.absolute(ck_for_each_window) / 4096
+    ak_for_each_window[:, 1:(-1 if N % 2 == 0 else None)] *= 2
     spectrogram = ak_for_each_window.T
 
     T = len(digital) / fs
