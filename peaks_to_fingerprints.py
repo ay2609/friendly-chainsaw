@@ -45,11 +45,11 @@ def peaks_to_fingerprints(
             pass
 
         elif fan_value + index > len(peaks) - 1:
-            for j in range(len(peaks) - 1 - index):
+            for j in range(1, len(peaks) - 1 - index):
                 fingerprints.append(((freq, peaks[index + j][0], peaks[index + j][1] - time), time))
 
         else:
-            for j in range(fan_value):
+            for j in range(1, fan_value):
                 fingerprints.append(((freq, peaks[index + j][0], peaks[index + j][1] - time), time))
 
     return fingerprints
