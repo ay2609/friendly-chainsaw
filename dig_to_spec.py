@@ -89,7 +89,7 @@ def digital_to_spec(
     fig, ax = plt.subplots()
 
     ax.imshow(
-        np.log(spectrogram),
+        np.log(spectrogram) - np.median(np.log(spectrogram)),
         origin="lower",
         aspect=aspect_ratio,
         extent=extent,
