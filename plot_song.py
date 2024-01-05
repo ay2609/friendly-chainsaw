@@ -5,7 +5,7 @@ import numpy as np
 import librosa
 from mygrad import sliding_window_view
 
-from const import MIN_FRAC_AMP_CUTOFF, LOCAL_PEAK_NN_RADIUS, SAMPLING_RATE
+from const import MIN_FRAC_AMP_CUTOFF, LOCAL_PEAK_NN_RADIUS, SAMPLING_RATE, FINGERPRINT_FANOUT
 from microphone.config import settings
 
 from typing import Union, Tuple
@@ -14,6 +14,7 @@ from pathlib import Path
 from dig_to_spec import digital_to_spec
 from rand_clip import get_digital_recording
 from peaks import local_peaks
+from peaks_to_fingerprints import peaks_to_fingerprints
 
 
 def plot_song(
@@ -23,7 +24,7 @@ def plot_song(
         sampling_rate: int = SAMPLING_RATE,
         min_frac_amp_cutoff: float = MIN_FRAC_AMP_CUTOFF,
         local_peak_nn_radius: int = LOCAL_PEAK_NN_RADIUS,
-): # -> Tuple[matplotlib.figure, matplotlib.axes]:
+): # -> matplotlib.figure, matplotlib.axes:
     """
 
     Plot a spectrogram and fingerprint features for a song.
@@ -54,22 +55,28 @@ def plot_song(
 
     spectrogram, cutoff, fig, ax, window_df, window_dt = digital_to_spec(song, fs=sampling_rate, frac_cut=min_frac_amp_cutoff, plot=True)
 
-    cutting = int(np.max(spectrogram) * min_frac_amp_cutoff)
+    cutting = int(np.max(np.log(spectrogram) - np.median(np.log(spectrogram))) * min_frac_amp_cutoff)
 
-    peaks = local_peaks(np.log(spectrogram), cutting, local_peak_nn_radius)
+    # print("max", np.max(np.log(spectrogram) - np.median(np.log(spectrogram))))
+
+    peaks = local_peaks(np.log(spectrogram) - np.median(np.log(spectrogram)), cutting, local_peak_nn_radius)
 
     plotted_peaks = np.array([(window_dt * time, window_df * freq) for freq, time in peaks])
 
     if plotted_peaks != []:
         plt.gca().scatter(plotted_peaks[:, 0], plotted_peaks[:, 1], c='r')
 
+    fingerprints = peaks_to_fingerprints(peaks, fan_value=FINGERPRINT_FANOUT)
+
+    print("peek", peaks)
+
     return fig, ax
 
 
 # song, s_rate = get_digital_recording(1) # librosa not working, recordings not working
-song, s_rate = librosa.load("trumpet.wav", sr=44100, mono=True)
-
-fig, ax = plot_song(song)
-
-plt.show()
+# song, s_rate = librosa.load("trumpet.wav", sr=44100, mono=True)
+#
+# fig, ax = plot_song(song)
+#
+# plt.show()
 
