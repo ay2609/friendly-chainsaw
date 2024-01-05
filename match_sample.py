@@ -1,4 +1,5 @@
 import numpy as _np
+import matplotlib.pyplot as plt
 
 from const import MIN_FRAC_AMP_CUTOFF, LOCAL_PEAK_NN_RADIUS, FINGERPRINT_FANOUT, SAMPLING_RATE
 from dig_to_spec import digital_to_spec
@@ -45,24 +46,26 @@ def match_sample(
     str
         The song-ID for the best match. `None` if no match"""
 
-    # Student Code:
-
-    # take random sample of the full original sample
-    rc = rand_clip(sample_digital, 5, fs)
-
-    # create a spectrogram from the random sample
-    spec, cutoff = digital_to_spec(rc, fs, frac_cut=min_frac_amp_cutoff, plot=False)
+    # create a spectrogram
+    # spec, cutoff = digital_to_spec(sample_digital, fs, frac_cut=min_frac_amp_cutoff, plot=False)
+    spec, cutoff, fig, ax, window_df, window_dt = digital_to_spec(sample_digital, fs=fs, frac_cut=min_frac_amp_cutoff, plot=True)
 
     # take the peaks of the spectrogram
-    ps = local_peaks(spec, 0, local_peak_nn_radius)
+    cutting = int(_np.max(_np.log(spec) - _np.median(_np.log(spec))) * min_frac_amp_cutoff)
+    peaks = local_peaks(_np.log(spec) - _np.median(_np.log(spec)), cutting, local_peak_nn_radius)
+
+    plotted_peaks = _np.array([(window_dt * time, window_df * freq) for freq, time in peaks])
+
+    if peaks != []:
+        plt.gca().scatter(plotted_peaks[:, 0], plotted_peaks[:, 1], c='r')
 
     # form fingerprints based on the peaks
-    fins = peaks_to_fingerprints(ps, fingerprint_fanout)
+    fins = peaks_to_fingerprints(peaks, fingerprint_fanout)
 
     # match the fingerprints from the sample to fingerprints from the database
     name = matches_to_best_match(fingerprints_to_matches(fins))
 
-    return (name)
+    return name
 
     #code to also return artist:
      # + ("" if artist is None else " by {}".format(artist)))
