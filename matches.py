@@ -43,13 +43,13 @@ def fingerprints_to_matches(
         An iterable of song IDs that had matching peak-pair signatures, and the time offset between when
         the signature occurred in the song versus the sample."""
 
-    counter = np.zeros(10)
+    counter = np.zeros(len(Database.get_instance().song_list))
 
     lol = Database.get_instance().pair_mapping.keys()
 
     for f1_f2_dt, t_sample in sample_fingerprints:
         for f1_f2_dt_song in lol:
-            if f1_f2_dt == f1_f2_dt_song:
+            if abs(f1_f2_dt[0] - f1_f2_dt_song[0]) < 3 and abs(f1_f2_dt[1] - f1_f2_dt_song[1]) < 3 and abs(f1_f2_dt[2] - f1_f2_dt_song[2]) < 3:
                 counter[Database.get_instance()[f1_f2_dt_song][0][0]] += 1
 
     print(counter)
