@@ -11,6 +11,7 @@ from peaks import local_peaks
 from peaks_to_fingerprints import peaks_to_fingerprints
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 PathLike = Union[str, Path]
 
@@ -273,13 +274,14 @@ class Database:
 
             digital, fs = librosa.load(file_path, sr=sampling_rate, mono=True)
 
-            spec, cutoff = digital_to_spec(digital, fs, frac_cut=min_frac_amp_cutoff)
-            cutting = int(np.max(spec) * min_frac_amp_cutoff)
+            spec, cutoff, fig, ax, window_df, window_dt = digital_to_spec(digital, fs=sampling_rate,
+                                                                          frac_cut=min_frac_amp_cutoff, plot=True)
+            cutting = int(np.max(np.log(spec) - np.median(np.log(spec))) * min_frac_amp_cutoff)
+            peaks = local_peaks(np.log(spec) - np.median(np.log(spec)), cutting, local_peak_nn_radius)
 
-            peaks = local_peaks(spec,
-                                amp_min=cutting,
-                                p_nn=local_peak_nn_radius,
-                                )
+            plotted_peaks = np.array([(window_dt * time, window_df * freq) for freq, time in peaks])
+            if peaks != []:
+                plt.gca().scatter(plotted_peaks[:, 0], plotted_peaks[:, 1], c='r')
 
             for f1_f2_dt, t1 in peaks_to_fingerprints(peaks, fan_value=fingerprint_fanout):
                 self._pair_mapping[f1_f2_dt].append((song_id, t1))
@@ -296,4 +298,4 @@ class Database:
 
     def list_songs(self) -> list[Song]:
         sorted_song = sorted(x for x in self._song_list if x is not None)
-        return [Song(*x) for x in sorted_song]
+        return [Song(*x) for x in self._song_list if x is not None]
