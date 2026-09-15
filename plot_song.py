@@ -73,10 +73,10 @@ def plot_song(
     return fig, ax
 
 
-# song, s_rate = get_digital_recording(1) # librosa not working, recordings not working
-# song, s_rate = librosa.load("trumpet.wav", sr=44100, mono=True)
-#
-# fig, ax = plot_song(song)
-#
-# plt.show()
+song, s_rate = get_digital_recording(1) # librosa not working, recordings not working
+song, s_rate = librosa.load("trumpet.wav", sr=44100, mono=True)
+
+fig, ax = plot_song(song)
+
+plt.show()
 

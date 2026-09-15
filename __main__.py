@@ -3,6 +3,10 @@ from time import time
 from database import Database
 
 from match_sample import match_sample
+from plot_song import plot_song
+from rand_clip import get_digital_recording
+
+import matplotlib.pyplot as plt
 
 import librosa
 
@@ -21,28 +25,19 @@ print(database.list_songs())
 start = time()
 dt = time() - start
 
-database.save()
+# database.save()
 
-samps, sr = librosa.load("sturdy-garbanzo/WAP.ogg", mono=True)
+samps, sr = librosa.load("sturdy-garbanzo/DownbytheRiver.ogg", sr=SAMPLING_RATE, mono=True, duration=30, offset=10)
 
-match = match_sample(samps, SAMPLING_RATE)
+# samps, sr = get_digital_recording(15)
+
+print("samples", sr)
+
+# plot_song(samps, sampling_rate=sr)
+#
+match = match_sample(samps, fs=sr)
 print(match)
 
-# PROVIDED CODE FOR ADDING SONGS TO DATABASE
-# songs = [
-#     #r"D:\My Music\Pink Floyd Wish You Were Here.mp3",
-#     "Beatles_TwistAndShout.mp3"
-#     #, r"D:\My Music\JimiHendrix_LittleWing.mp3"
-#     ]
-#
-# names = [
-#     #"Wish you were Here",
-#     "Twist and Shout"
-#     #, "Little Wing"
-#     ]
-#
-# artists = [
-#     #"Pink Floyd",
-#     "The Beatles"
-#     #, "Jimi Hendrix"
-#     ]
+print(database.song_list[match])
+
+plt.show()

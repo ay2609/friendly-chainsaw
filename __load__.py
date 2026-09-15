@@ -4,6 +4,8 @@ from database import Database
 from garbanzo_reader import read_garbanzo
 from rich.pretty import pprint
 
+import matplotlib.pyplot as plt
+
 database = Database.get_instance()
 database.switch_db("goodone")
 

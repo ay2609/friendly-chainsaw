@@ -44,17 +44,28 @@ def fingerprints_to_matches(
         the signature occurred in the song versus the sample."""
 
     counter = np.zeros(len(Database.get_instance().song_list))
+    max_fingies = np.zeros_like(counter)
 
     lol = Database.get_instance().pair_mapping.keys()
 
+    for f1_f2_dt_song in lol:
+        for song_id, _ in Database.get_instance()[f1_f2_dt_song]:
+            max_fingies[song_id] += 1
+
     for f1_f2_dt, t_sample in sample_fingerprints:
         for f1_f2_dt_song in lol:
-            if abs(f1_f2_dt[0] - f1_f2_dt_song[0]) < 3 and abs(f1_f2_dt[1] - f1_f2_dt_song[1]) < 3 and abs(f1_f2_dt[2] - f1_f2_dt_song[2]) < 3:
-                counter[Database.get_instance()[f1_f2_dt_song][0][0]] += 1
+            if abs(f1_f2_dt[0] - f1_f2_dt_song[0]) < 2 and abs(f1_f2_dt[1] - f1_f2_dt_song[1]) < 2 and abs(f1_f2_dt[2] - f1_f2_dt_song[2]) < 2:
+            # if f1_f2_dt == f1_f2_dt_song:
+                for song_id, _ in Database.get_instance()[f1_f2_dt_song]:
+                    counter[song_id] += 1
+                # counter[Database.get_instance()[f1_f2_dt_song][0][0]] += 1
 
+    print(max_fingies)
     print(counter)
 
-    return counter
+
+
+    return np.array([value/max_fingies[index] for index, value in enumerate(counter)])
 
 
 def matches_to_best_match(matches: Iterable[FingerprintOffsets]) -> int:
@@ -75,4 +86,7 @@ def matches_to_best_match(matches: Iterable[FingerprintOffsets]) -> int:
         The song-ID with the most common time-offset with the sample."""
 
     # Student Code:
+
+    print(matches)
+
     return np.argmax(matches)

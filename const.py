@@ -18,4 +18,4 @@ LOCAL_PEAK_NN_RADIUS: int = 10
 
 # Given a spectrogram peak, indicates the maximum number of subsequent peaks to
 # be used to form fingerprint features.
-FINGERPRINT_FANOUT: int = 15
+FINGERPRINT_FANOUT: int = 5

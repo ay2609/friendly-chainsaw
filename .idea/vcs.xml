@@ -4,5 +4,6 @@
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Microphone" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/lib/Microphone" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/sturdy-garbanzo" vcs="Git" />
   </component>
 </project>
